@@ -91,4 +91,62 @@ exp=> */ DELETE FROM statistiques,
 affiché Nom, prénom, date de naissance des employés
 exp=> */ SELECT LastName, FirstName, BirthDate FROM employees
 
+/*-------------------------------Je veux afficher pour un produit :	
 
+le nom du produit   =>  ProductName dans la table des produits Products	
+le nom du fournisseur => CompanyName dans Suppliers
+	
+la catégorie de produit => CategoryName dans Categories
+exp => */SELECT products.ProductName AS 'Nom du produit', suppliers.CompanyName AS 'Nom du fournisseur', categories.CategoryName AS 'Catégorie du produit' FROM products, suppliers, categories 
+/*les conditions */WHERE products.ProductID = 1 AND (products.CategoryID = categories.CategoryID) AND (products.SupplierID = suppliers.SupplierID);
+
+
+/*---------------------------------------------- Faire des jointures------------------
+
+/*--------------------avoir plus d'info en rajoutant la ville et le pays et le prix du produit
+exp => */ SELECT products.ProductName AS 'Nom du produit', suppliers.CompanyName AS 'Nom du fournisseur', categories.CategoryName AS 'Catégorie du produit', products.UnitPrice AS 'Prix du produit', suppliers.City AS 'Ville du fournisseur', suppliers.Country AS 'Pays du fournisseur'
+FROM products, suppliers, categories
+WHERE products.ProductID = 1 AND (products.CategoryID = categories.CategoryID) AND (products.SupplierID = suppliers.SupplierID)
+
+/*exercice(1): Afficher le nom, le prénom, la date de naissance de tous les employés qui ont comme titre "Sales Representative" ?*/
+SELECT LastName, FirstName, BirthDate FROM employees WHERE Title="Sales Representative";
+
+/*Exercice(2) :Où travaille Janet Leverling (Nom du territoire et de la région) ?
+
+1) dans quels tables on peut trouver ces infos ?
+
+employees, employeeterritories, territories, regions
+
+2) dans ces tables, quels sont les champs demandés ?
+
+employees : FirstName, LastName
+
+territories : territoryDescription
+
+regions : regionDescription
+
+3) relier les tables pour avoir les infos associées*/
+
+                      /*  la syntaxe Nonnormalisée   */
+
+SELECT E.FirstName, E.LastName, T.TerritoryDescription, R.RegionDescription
+FROM employees AS E, employeeterritories AS ET, territories AS T, region AS R
+WHERE (E.EmployeeID = ET.EmployeeID) AND (ET.TerritoryID = T.TerritoryID) AND (T.RegionID = R.RegionID) AND (E.FirstName = 'Janet') AND (E.LastName = 'Leverling')
+
+/*                       Avec la syntaxe Normalisée*/
+
+
+SELECT products.ProductName AS 'Nom du produit', suppliers.CompanyName AS 'Nom du fournisseur', categories.CategoryName AS 'Catégorie du produit', products.UnitPrice AS 'Prix du produit', suppliers.City AS 'Ville du fournisseur', suppliers.Country AS 'Pays du fournisseur' FROM products JOIN suppliers ON products.SupplierID=suppliers.SupplierID JOIN categories ON categories.CategoryID = products.CategoryID WHERE products.ProductID=1;
+
+
+/*exo (4): Tous les clients de Londres (nom de la société, nom de la personne de contact, n° de telephone) classés par ordre alphabétique ?*/
+
+SELECT customers.CompanyName, customers.ContactName, customers.Phone FROM customers WHERE customers.City="London" ORDER BY customers.CompanyName;
+
+/*exo(5)Quel employé a réalisé la commande 10256, avec quel transporteur et pour quel client ?
+Quel employé ? voir dans la table employees, LastName et FirstName
+Quelle commande ? table Orders, OrderID
+Quel transporteur ? table Shippers, CompanyName
+Quel client ? table Customers, ContactName*/
+
+SELECT employees.LastName, employees.FirstName, orders.OrderID, shippers.CompanyName AS "Transporteur", customers.ContactName AS "Client" FROM orders JOIN employees ON orders.EmployeeID = employees.EmployeeID JOIN shippers ON shippers.ShipperID = orders.ShipVia JOIN customers ON customers.CustomerID = orders.CustomerID WHERE orders.OrderID = 10256;
