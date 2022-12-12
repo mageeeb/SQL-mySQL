@@ -62,11 +62,22 @@ exp=>*/ INSERT INTO statistiques VALUES(NULL,'mon nouveau pays',12345789,2022,40
 
                     /*-----------------------------------------INSERT TO----------------------------------------------------------------*/
 
-/*insertion de plusieur pays dans le table--------------------------
+/*insertion de plusieur pays dans la table--------------------------
 exp => */ INSERT INTO statistiques, VALUES 
           (NULL,'Pays1',10000,2020,100,100), 
           (NULL,'Pays2',25000,2021,1250,20), 
           (NULL,'Pays3',50000,2020,5000,10); 
+
+    /*Ajouter dans les territoires  Los Angeles (90011) et Las Vegas (89123) qui sont de la région Western*/
+INSERT INTO territories VALUES(90011,'Los Angeles',2);
+
+INSERT INTO territories VALUES(89213,'Las Vegas',2);
+
+/*ou bien*/
+
+INSERT INTO territories VALUES(90011,'Los Angeles',2) , (89213,'Las Vegas',2);
+
+
 
           /*-----------------------------------------UPDATE----------------------------------------------------------------*/
 
@@ -79,6 +90,11 @@ exp=> */UPDATE statistiques,
       exp=>  */ UPDATE statistiques,
                 SET annee= 2021
                 WHERE annee=2011
+
+/*Corriger la valeur 'Westerns' par Western dans la table Region*/
+UPDATE region
+SET RegionDescription='Western'
+WHERE RegionID=2
     
                     /*-----------------------------------------DELETE----------------------------------------------------------------*/
 
@@ -90,5 +106,52 @@ exp=> */ DELETE FROM statistiques,
                                 /*en téléchargent une nouvelle DB, northwind
 affiché Nom, prénom, date de naissance des employés
 exp=> */ SELECT LastName, FirstName, BirthDate FROM employees
+
+/*Liste des employés (Nom, Prénom, date de naissance, salaire) classés par salaire (du plus haut au plus bas)*/
+SELECT FirstName,LastName,BirthDate,Salary 
+FROM employees
+ORDER BY Salary DESC
+
+/* le mm resultat en concaténation*/
+SELECT CONCAT (LastName,'', FirstName), BirthDate, Salary FROM employees ORDER BY Salary DESC;
+
+/*Affiché le mm résultat avec la date en format jour,mois et date*/
+SELECT CONCAT (LastName,'', FirstName) AS Identité/*pour afficher ça au lieu de la fonction*/, DATE_FORMAT (BirthDate,"%W %d %M %Y"), Salary FROM employees ORDER BY Salary DESC;
+
+SELECT CONCAT (LastName,'', FirstName) AS Identité, DATE_FORMAT (BirthDate,"%W %d %M %Y")AS 'Date de naissance'/*pour affiché ça au lieu de la fonction*/ , Salary FROM employees ORDER BY Salary DESC;
+
+
+/*Liste des employés (Nom, Prénom, Age, Ancienneté) classés par ordre alphabétique des noms*/
+SELECT FirstName,LastName,FLOOR(DATEDIFF(NOW(),BirthDate)/365.25) AS Age, FLOOR(DATEDIFF(NOW(),HireDate)/365.25) AS Ancienneté
+FROM employees
+ORDER BY LastName
+/*explication =>NOW() renvoie la date du jour et BirthDate est la date de naissance,
+donc pour connaître l'âge, on calcule la différence de jours avec DATEDIFF, ça renvoie le nombre de jours.
+ensuite on divise par 365.25 (pour tenir compte des années bissextiles) et on arrondit vers le bas avec FLOOR()
+Pour calculer l'ancienneté :
+Idem mais on remplace la date de naissance par la date d'engagement (HireDate)*/
+
+
+/*Liste des employés (Nom Prénom) qui travaillent sur le territoire de Boston
+
+
+	
+on trouve les employés dans la table employees
+
+
+
+	
+on trouve Boston dans la table territories
+
+
+
+	
+on trouve quel employé travaille dans quel territoire dans */
+
+SELECT employees.LastName, employees.FirstName, territories.TerritoryDescriptionFROM employees
+JOIN employeeterritories ON employees.EmployeeID = employeeterritories.EmployeeID
+JOIN territories ON territories.TerritoryID = employeeterritories.TerritoryID
+WHERE territories.TerritoryDescription = 'Boston'
+
 
 
